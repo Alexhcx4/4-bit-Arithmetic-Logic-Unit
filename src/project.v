@@ -5,7 +5,7 @@
 
 `timescale 1ns / 1ps
 
-module ALU (
+module tt_um_ALUejemplo (
     input  wire [4:0] FS,
     input  wire [3:0] A_Data,
     input  wire [3:0] B_Data,

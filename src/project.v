@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 202 TECNM-ITTehuacán
+ * Copyright (c) 2026 TECNM-ITTehuacán
  * SPDX-License-Identifier: Apache-2.0
  */
 

@@ -6,9 +6,9 @@
 `default_nettype none
 
 module tt_um_ALUejemplo (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
+    input  wire [7:0] ui_in,    // Dedicated inputs: A[3:0] = ui_in[3:0], B[3:0] = ui_in[7:4]
+    output wire [7:0] uo_out,   // Dedicated outputs: Result[3:0] = uo_out[3:0], {Z,N,C,V} = uo_out[7:4]
+    input  wire [7:0] uio_in,   // IOs: Input path: FS[4:0] = uio_in[4:0]
     output wire [7:0] uio_out,  // IOs: Output path
     output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
     input  wire       ena,      // always 1 when the design is powered, so you can ignore it
@@ -16,10 +16,10 @@ module tt_um_ALUejemplo (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Mapeo de entradas hacia la ALU de 4 bits
-  wire [4:0] fs_sel = {ui_in[4], uio_in[7:4]};
+  // Mapeo de entradas según el pinout documentado
   wire [3:0] a_data = ui_in[3:0];
-  wire [3:0] b_data = uio_in[3:0];
+  wire [3:0] b_data = ui_in[7:4];
+  wire [4:0] fs_sel = uio_in[4:0];
 
   // Salidas internas de la ALU
   wire [3:0] alu_result;
@@ -39,13 +39,13 @@ module tt_um_ALUejemplo (
       .Z      (flag_z)
   );
 
-  // Salidas dedicadas y pines bidireccionales no usados como salida
+  // Salidas dedicadas y pines bidireccionales configurados como entrada
   assign uo_out  = {flag_z, flag_n, flag_c, flag_v, alu_result};
   assign uio_out = 8'b0000_0000;
   assign uio_oe  = 8'b0000_0000;
 
-  // Evitar advertencias por señales sin usar en este diseño combinacional
-  wire _unused = &{ena, clk, rst_n, ui_in[7:5], 1'b0};
+  // Evitar advertencias por señales sin usar
+  wire _unused = &{ena, clk, rst_n, uio_in[7:5], 1'b0};
 
 endmodule
 
@@ -120,9 +120,9 @@ module alu_4bit (
         C      = temp_v[4];
       end
 
-      // Transfer A
+      // Transfer B
       5'b00111: begin
-        Result = A_Data;
+        Result = B_Data;
       end
 
       // A AND B

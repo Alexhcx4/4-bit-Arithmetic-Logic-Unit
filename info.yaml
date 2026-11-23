@@ -1,7 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "ALUejemplo"      # Project title
-  author:       "Alexia"      # Your name
+  author:       "Alexia Hernández Cadena"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "este es un ejemplo en verilog"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc

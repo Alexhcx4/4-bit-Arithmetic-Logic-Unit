@@ -21,12 +21,34 @@ This project implements a 4-bit combinational Arithmetic Logic Unit (`alu_4bit`)
 * **Logic and shifts**: `A AND B` (`01000`), `A OR B` (`01010`), `A XOR B` (`01100`), `NOT A` (`01110`), `NOT B` (`10000`), logical shift right `B >> 1` (`10100`), and logical shift left `B << 1` (`11000`). Undefined `FS` codes default to `Result = 4'b0000` and `C = 0`.
 * **Flags**: `V` indicates signed two's-complement overflow on supported arithmetic operations (including `A == 4'b1000` on `DEC A`), `C` captures carry-out or shifted-out bits, `N` reflects `Result[3]`, and `Z` asserts `1` when `Result == 4'b0000`.
 
+### Function select (`FS`) specification
+
+| `FS` (`uio_in[4:0]`) | Operation | `Result` (`uo_out[3:0]`) |
+| :--- | :--- | :--- |
+| `00000` | Transfer `A` | `A` |
+| `00001` | Increment `A` | `A + 1` |
+| `00010` | Add `A + B` | `A + B` |
+| `00011` | Add with carry-in | `A + B + 1` |
+| `00100` | Add bitwise NOT `B` | `A + ~B` |
+| `00101` | Subtract `A - B` | `A + ~B + 1` |
+| `00110` | Decrement `A` | `A - 1` |
+| `00111` | Transfer `B` | `B` |
+| `01000` | Bitwise AND | `A & B` |
+| `01010` | Bitwise OR | `A \| B` |
+| `01100` | Bitwise XOR | `A ^ B` |
+| `01110` | Bitwise NOT `A` | `~A` |
+| `10000` | Bitwise NOT `B` | `~B` |
+| `10100` | Shift right `B` | `B >> 1` |
+| `11000` | Shift left `B` | `B << 1` |
+| Any other (`default`) | Undefined / Reserved | `4'b0000` |
+
 ## How to test
 
-1. **Power and reset setup**: Supply regulated power (`VDD` and `GND`) to the board/chip.
+1. **Power and reset setup**: Supply regulated power (`VDD` and `GND`) to the board/chip, assert `rst_n` low (`0`) during initial power-up and then pull `rst_n` high (`1`), and keep `ena` high (`1`).
 2. **Drive inputs (`ui_in` and `uio_in`)**: Connect DIP switches, pushbuttons, or a microcontroller/pattern generator to drive `ui_in[3:0]` (`A0`–`A3`), `ui_in[7:4]` (`B0`–`B3`), and `uio_in[4:0]` (`FS0`–`FS4`). Leave `uio[7:5]` unconnected or at a known logic level (`uio_oe = 8'h00`).
 3. **Observe outputs (`uo_out`)**: Connect LEDs (with current-limiting resistors), a logic analyzer, or digital inputs on a microcontroller to `uo_out[3:0]` (`F0`–`F3`) to read `Result`, and to `uo_out[7:4]` to read `V` (`uo_out[4]`), `C` (`uo_out[5]`), `N` (`uo_out[6]`), and `Z` (`uo_out[7]`).
 4. **Verify operations and flags**: Step through desired `FS` opcodes and `A` / `B` input pairs (such as `00010` for `A + B`, `00101` for `A - B`, `10100` for `SHR B`, and `11111` for default `0000`), checking that `F0`–`F3` and the `V`, `C`, `N`, `Z` indicators match the expected values.
+
 ## External hardware
 
 No specialized external hardware is strictly required to run the ALU, as it is self-contained within the design pins. For physical bench testing and verification, you can use:

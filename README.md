@@ -1,42 +1,27 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+## How it works
 
-- [Read the documentation for project](docs/info.md)
+This project implements a 4-bit combinational Arithmetic Logic Unit (`alu_4bit`) wrapped inside the `tt_um_ALUejemplo` interface (`ui_in`, `uo_out`, `uio_in`). It takes two 4-bit operands (`A_Data` and `B_Data`) and a 5-bit function selector (`FS`) to produce a 4-bit result (`Result`) along with four status flags (`V`, `C`, `N`, and `Z`).
 
-## What is Tiny Tapeout?
+### Pin mapping
+* **Inputs (`ui_in`)**: `ui_in[3:0]` (`A0`–`A3`) provides operand `A`, and `ui_in[7:4]` (`B0`–`B3`) provides operand `B`.
+* **Function select (`uio_in`)**: `uio_in[4:0]` (`FS0`–`FS4`) selects the ALU operation. Bidirectional pins are configured as inputs (`uio_oe = 8'h00`, `uio_out = 8'h00`).
+* **Outputs (`uo_out`)**: `uo_out[3:0]` (`F0`–`F3`) outputs `Result`, while `uo_out[7:4]` outputs `{Z, N, C, V}` (`uo_out[4]` = `V`, `uo_out[5]` = `C`, `uo_out[6]` = `N`, `uo_out[7]` = `Z`).
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+### Operations and flags
+* **Arithmetic**: Transfer `A` (`00000`), increment `A + 1` (`00001`), add `A + B` (`00010`), add with carry-in `A + B + 1` (`00011`), `A + ~B` (`00100`), subtract `A - B` (`00101`), decrement `A - 1` (`00110`), and transfer `B` (`00111`).
+* **Logic and shifts**: `A AND B` (`01000`), `A OR B` (`01010`), `A XOR B` (`01100`), `NOT A` (`01110`), `NOT B` (`10000`), logical shift right `B >> 1` (`10100`), and logical shift left `B << 1` (`11000`). Undefined `FS` codes default to `Result = 4'b0000` and `C = 0`.
+* **Flags**: `V` indicates signed two's-complement overflow on supported arithmetic operations (including `A == 4'b1000` on `DEC A`), `C` captures carry-out or shifted-out bits, `N` reflects `Result[3]`, and `Z` asserts `1` when `Result == 4'b0000`.
 
-To learn more and get started, visit https://tinytapeout.com.
+## How to test
 
-## Set up your Verilog project
+1. **Power and reset setup**: Supply regulated power (`VDD` and `GND`) to the board/chip.
+2. **Drive inputs (`ui_in` and `uio_in`)**: Connect DIP switches, pushbuttons, or a microcontroller/pattern generator to drive `ui_in[3:0]` (`A0`–`A3`), `ui_in[7:4]` (`B0`–`B3`), and `uio_in[4:0]` (`FS0`–`FS4`). Leave `uio[7:5]` unconnected or at a known logic level (`uio_oe = 8'h00`).
+3. **Observe outputs (`uo_out`)**: Connect LEDs (with current-limiting resistors), a logic analyzer, or digital inputs on a microcontroller to `uo_out[3:0]` (`F0`–`F3`) to read `Result`, and to `uo_out[7:4]` to read `V` (`uo_out[4]`), `C` (`uo_out[5]`), `N` (`uo_out[6]`), and `Z` (`uo_out[7]`).
+4. **Verify operations and flags**: Step through desired `FS` opcodes and `A` / `B` input pairs (such as `00010` for `A + B`, `00101` for `A - B`, `10100` for `SHR B`, and `11111` for default `0000`), checking that `F0`–`F3` and the `V`, `C`, `N`, `Z` indicators match the expected values.
+## External hardware
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
-
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
-
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+No specialized external hardware is strictly required to run the ALU, as it is self-contained within the design pins. For physical bench testing and verification, you can use:
+* **Input drivers**: 13 digital switches or DIP switches (4 for `A0`–`A3`, 4 for `B0`–`B3`, and 5 for `FS0`–`FS4`), or digital output pins from a microcontroller/FPGA board to automate test vectors.
+* **Output indicators / instrumentation**: 8 LEDs (with series current-limiting resistors) for `F0`–`F3` and `V`, `C`, `N`, `Z`, or a logic analyzer / digital acquisition setup to capture and verify states.

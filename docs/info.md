@@ -23,10 +23,12 @@ This project implements a 4-bit combinational Arithmetic Logic Unit (`alu_4bit`)
 
 ## How to test
 
-1. **Simulation in Vivado**: Add `ALUchip.v` (design source) and `tb_tt_um_ALUejemplo.v` or `ALU_tb_dirigido.v` (simulation sources), set the desired testbench as top, and run **Behavioral Simulation**.
-2. **Apply stimulus**: Set `ui_in[3:0]` (`A`), `ui_in[7:4]` (`B`), and `uio_in[4:0]` (`FS`). Because the core ALU is combinational, `uo_out` updates immediately for each input combination.
-3. **Verify outputs**: Read `uo_out[3:0]` for the 4-bit result and `uo_out[7:4]` for `{Z, N, C, V}`, confirming zero mismatches in the simulation log or console.
-
+1. **Power and reset setup**: Supply regulated power (`VDD` and `GND`) to the board/chip.
+2. **Drive inputs (`ui_in` and `uio_in`)**: Connect DIP switches, pushbuttons, or a microcontroller/pattern generator to drive `ui_in[3:0]` (`A0`–`A3`), `ui_in[7:4]` (`B0`–`B3`), and `uio_in[4:0]` (`FS0`–`FS4`). Leave `uio[7:5]` unconnected or at a known logic level (`uio_oe = 8'h00`).
+3. **Observe outputs (`uo_out`)**: Connect LEDs (with current-limiting resistors), a logic analyzer, or digital inputs on a microcontroller to `uo_out[3:0]` (`F0`–`F3`) to read `Result`, and to `uo_out[7:4]` to read `V` (`uo_out[4]`), `C` (`uo_out[5]`), `N` (`uo_out[6]`), and `Z` (`uo_out[7]`).
+4. **Verify operations and flags**: Step through desired `FS` opcodes and `A` / `B` input pairs (such as `00010` for `A + B`, `00101` for `A - B`, `10100` for `SHR B`, and `11111` for default `0000`), checking that `F0`–`F3` and the `V`, `C`, `N`, `Z` indicators match the expected values.
 ## External hardware
 
-No external hardware is required. For standalone simulation or bench testing, standard digital switches/DIP switches can drive `ui_in` and `uio_in`, and LEDs or a logic analyzer can observe `uo_out`.
+No specialized external hardware is strictly required to run the ALU, as it is self-contained within the design pins. For physical bench testing and verification, you can use:
+* **Input drivers**: 13 digital switches or DIP switches (4 for `A0`–`A3`, 4 for `B0`–`B3`, and 5 for `FS0`–`FS4`), or digital output pins from a microcontroller/FPGA board to automate test vectors.
+* **Output indicators / instrumentation**: 8 LEDs (with series current-limiting resistors) for `F0`–`F3` and `V`, `C`, `N`, `Z`, or a logic analyzer / digital acquisition setup to capture and verify states.

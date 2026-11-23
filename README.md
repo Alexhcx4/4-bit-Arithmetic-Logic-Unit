@@ -2,6 +2,8 @@
 
 <!---
 
+<!---
+
 This file is used to generate your project datasheet. Please fill in the information below and delete any unused
 sections.
 
@@ -25,24 +27,24 @@ This project implements a 4-bit combinational Arithmetic Logic Unit (`alu_4bit`)
 
 ### Function select (`FS`) specification
 
-| `FS` (`uio_in[4:0]`) | Operation | `Result` (`uo_out[3:0]`) | Carry (`C`, `uo_out[5]`) | Overflow (`V`, `uo_out[4]`) | `N` (`uo_out[6]`) / `Z` (`uo_out[7]`) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `00000` | Transfer `A` | `A` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `00001` | Increment `A` | `A + 1` | Carry-out of `A + 1` | `A[3] & ~Result[3]` | `Result[3]` / `Result == 0` |
-| `00010` | Add `A + B` | `A + B` | Carry-out of `A + B` | Signed add overflow (`A + B`) | `Result[3]` / `Result == 0` |
-| `00011` | Add with carry-in | `A + B + 1` | Carry-out of `A + B + 1` | Signed add overflow (`A + B + 1`) | `Result[3]` / `Result == 0` |
-| `00100` | Add bitwise NOT `B` | `A + ~B` | Carry-out of `A + ~B` | Signed sub/diff overflow (`A, ~B`) | `Result[3]` / `Result == 0` |
-| `00101` | Subtract `A - B` | `A + ~B + 1` | Carry-out of `A + ~B + 1` | Signed sub overflow (`A - B`) | `Result[3]` / `Result == 0` |
-| `00110` | Decrement `A` | `A - 1` | Borrow/carry bit of `A - 1` | `1` if `A == 4'b1000`, else `0` | `Result[3]` / `Result == 0` |
-| `00111` | Transfer `B` | `B` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `01000` | Bitwise AND | `A & B` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `01010` | Bitwise OR | `A \| B` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `01100` | Bitwise XOR | `A ^ B` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `01110` | Bitwise NOT `A` | `~A` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `10000` | Bitwise NOT `B` | `~B` | `0` | `0` | `Result[3]` / `Result == 0` |
-| `10100` | Shift right `B` | `B >> 1` | `B[0]` | `0` | `Result[3]` / `Result == 0` |
-| `11000` | Shift left `B` | `B << 1` | `B[3]` | `0` | `Result[3]` / `Result == 0` |
-| Any other (`default`) | Undefined / Reserved | `4'b0000` | `0` | `0` | `0` / `1` |
+| `FS` (`uio_in[4:0]`) | Operation | `Result` (`uo_out[3:0]`) |
+| :--- | :--- | :--- |
+| `00000` | Transfer `A` | `A` |
+| `00001` | Increment `A` | `A + 1` |
+| `00010` | Add `A + B` | `A + B` |
+| `00011` | Add with carry-in | `A + B + 1` |
+| `00100` | Add bitwise NOT `B` | `A + ~B` |
+| `00101` | Subtract `A - B` | `A + ~B + 1` |
+| `00110` | Decrement `A` | `A - 1` |
+| `00111` | Transfer `B` | `B` |
+| `01000` | Bitwise AND | `A & B` |
+| `01010` | Bitwise OR | `A \| B` |
+| `01100` | Bitwise XOR | `A ^ B` |
+| `01110` | Bitwise NOT `A` | `~A` |
+| `10000` | Bitwise NOT `B` | `~B` |
+| `10100` | Shift right `B` | `B >> 1` |
+| `11000` | Shift left `B` | `B << 1` |
+| Any other (`default`) | Undefined / Reserved | `4'b0000` |
 
 ## How to test
 
